@@ -90,7 +90,7 @@ function parseLssFile(text: string): ParsedLss | null {
           id:             `run-imported-${Date.now()}`,
           date:           new Date().toISOString(),
           segments:       pbSegments,
-          totalTime:      pbSegments[pbSegments.length - 1].elapsedTime,
+          totalTime:      pbSegments[pbSegments.length - 1].elapsedTime ?? 0,
           isPersonalBest: true,
         }
       : null;

@@ -50,7 +50,7 @@ interface AppState {
   currentSplitIndex: number;
   startTime: number | null;
   accumulatedTime: number;
-  splitTimes: number[];      // elapsed ms at each completed split
+  splitTimes: (number | null)[];  // elapsed ms at each completed split, null = skipped
   currentTime: number;
 
   // Timer actions
