@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Default theme (Void) ─────────────────────────── */
+:root {
+  --bg-primary:       #10101e;
+  --bg-secondary:     #16162c;
+  --bg-tertiary:      #1e1e38;
+  --bg-split-even:    #131324;
+  --bg-split-odd:     #10101e;
+  --bg-split-active:  #162030;
+  --text-primary:     #e8eaf6;
+  --text-secondary:   #6068a0;
+  --text-accent:      #00d4ff;
+  --text-timer:       #ffffff;
+  --text-ahead:       #00ff9d;
+  --text-behind:      #ff2d55;
+  --text-best:        #ffe600;
+  --text-skipped:     #3a3d50;
+  --border-color:     #22223a;
+  --btn-primary-bg:   #00d4ff;
+  --btn-primary-text: #10101e;
+  --btn-danger-bg:    #ff2d55;
+  --btn-danger-text:  #ffffff;
+  --graph-current:    #00d4ff;
+  --graph-pb:         #ffe600;
+  --graph-grid:       #22223a;
+  --scrollbar-thumb:  #28284a;
+  --glow-primary:     #00d4ff;
+  --glow-primary-40:  rgba(0, 212, 255, 0.40);
+  --glow-primary-20:  rgba(0, 212, 255, 0.20);
+  --glow-primary-10:  rgba(0, 212, 255, 0.10);
+  --glow-ahead:       rgba(0, 255, 157, 0.50);
+  --glow-behind:      rgba(255, 45, 85, 0.50);
+  --glow-gold:        rgba(255, 230, 0, 0.50);
+  --header-gradient:  linear-gradient(180deg, #1a1a30 0%, #10101e 100%);
+  --split-active-bg:  linear-gradient(90deg, rgba(0,212,255,0.10) 0%, transparent 100%);
+}
+
+/* ── Reset ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 2px;
+}
+
+/* ── Mono font ────────────────────────────────────── */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+}
+
+/* ── Timer glow ───────────────────────────────────── */
+.timer-glow {
+  text-shadow:
+    0 0 8px  var(--glow-primary-40),
+    0 0 20px var(--glow-primary-20),
+    0 0 40px var(--glow-primary-10);
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.timer-glow-ahead {
+  text-shadow:
+    0 0 8px  var(--glow-ahead),
+    0 0 20px var(--glow-ahead),
+    0 0 40px var(--glow-ahead);
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.timer-glow-behind {
+  text-shadow:
+    0 0 8px  var(--glow-behind),
+    0 0 20px var(--glow-behind),
+    0 0 40px var(--glow-behind);
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+.timer-glow-gold {
+  text-shadow:
+    0 0 8px  var(--glow-gold),
+    0 0 20px var(--glow-gold),
+    0 0 40px var(--glow-gold);
+}
+
+/* ── Paused pulse ─────────────────────────────────── */
+@keyframes paused-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+.timer-paused {
+  animation: paused-pulse 1.4s ease-in-out infinite;
+}
+
+/* ── Active split left bar ────────────────────────── */
+.split-row-active {
+  border-left: 2px solid var(--glow-primary) !important;
+  background: var(--split-active-bg) !important;
+  box-shadow: inset 0 0 20px var(--glow-primary-10);
+}
+.split-row-inactive {
+  border-left: 2px solid transparent;
+}
+
+/* ── Accent glow on text (delta faster) ───────────── */
+.glow-ahead  { text-shadow: 0 0 6px var(--glow-ahead); }
+.glow-behind { text-shadow: 0 0 6px var(--glow-behind); }
+.glow-gold   { text-shadow: 0 0 6px var(--glow-gold); }
+
+/* ── Buttons ──────────────────────────────────────── */
+button { cursor: pointer; border: none; background: none; }
+
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-weight: 700;
+  border-radius: 6px;
+  transition: box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 0 14px var(--glow-primary-40), 0 0 28px var(--glow-primary-20);
+}
+.btn-primary:disabled { opacity: 0.3; }
+
+.btn-ghost {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--glow-primary-40);
+  box-shadow: 0 0 8px var(--glow-primary-20);
+}
+.btn-ghost:disabled { opacity: 0.3; }
+
+.btn-danger {
+  background: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
+  font-weight: 600;
+  border-radius: 6px;
+  transition: box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn-danger:hover:not(:disabled) {
+  box-shadow: 0 0 14px var(--glow-behind), 0 0 28px var(--glow-behind);
+}
+.btn-danger:disabled { opacity: 0.3; }
+
+/* ── Settings buttons ─────────────────────────────── */
+.settings-btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s, opacity 0.15s;
+}
+.settings-btn-primary:hover {
+  box-shadow: 0 0 10px var(--glow-primary-40);
+}
+
+.settings-btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.settings-btn-secondary:hover {
+  border-color: var(--glow-primary-40);
+  color: var(--text-primary);
+}
+
+/* ── Misc ─────────────────────────────────────────── */
+input[type='range'] { cursor: pointer; }
+select { cursor: pointer; appearance: auto; }
+
+/* Thin accent line under header */
+.header-accent-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--glow-primary-40) 30%,
+    var(--glow-primary) 50%,
+    var(--glow-primary-40) 70%,
+    transparent 100%
+  );
+}
