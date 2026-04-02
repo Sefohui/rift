@@ -60,7 +60,7 @@ A modern speedrun timer for Windows, built to stand out from LiveSplit. Rift fea
 
 Download the latest installer from the [Releases](https://github.com/Sefohui/rift/releases) page.
 
-Run the `.msi` or `.exe` installer and follow the on-screen steps. No additional dependencies required.
+Run the `.exe` installer and follow the on-screen steps. No additional dependencies required.
 
 ---
 
