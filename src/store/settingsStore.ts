@@ -67,6 +67,7 @@ interface AppState {
   showSettings: boolean;
   setShowSettings: (v: boolean) => void;
   lastRunIsPersonalBest: boolean | null;
+  lastRunSegments: RunSegment[] | null;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -78,7 +79,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       const store = await getStore();
       const saved = await store.get<Settings>('settings');
       if (saved) {
-        set({ settings: { ...defaultSettings, ...saved }, settingsLoaded: true });
+        // Deep merge hotkeys so new actions (e.g. skipSplit) get their defaults
+        // even when loading settings saved before they existed
+        const mergedHotkeys = { ...defaultSettings.hotkeys, ...(saved.hotkeys ?? {}) };
+        set({ settings: { ...defaultSettings, ...saved, hotkeys: mergedHotkeys }, settingsLoaded: true });
       } else {
         set({ settingsLoaded: true });
       }
@@ -180,6 +184,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       splitTimes: [],
       currentTime: 0,
       lastRunIsPersonalBest: null,
+      lastRunSegments: null,
     });
   },
 
@@ -249,7 +254,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       isPersonalBest,
     };
 
-    set({ timerState: 'finished', currentTime: totalTime, lastRunIsPersonalBest: isPersonalBest });
+    // Save segments NOW (before PB update overwrites pbTime on splits)
+    set({ timerState: 'finished', currentTime: totalTime, lastRunIsPersonalBest: isPersonalBest, lastRunSegments: segments });
 
     // Update PB if needed
     const updates: Partial<Settings> = {};
@@ -276,4 +282,5 @@ export const useAppStore = create<AppState>((set, get) => ({
   showSettings: false,
   setShowSettings: (v) => set({ showSettings: v }),
   lastRunIsPersonalBest: null,
+  lastRunSegments: null,
 }));

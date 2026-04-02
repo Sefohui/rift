@@ -28,6 +28,7 @@ function toAccelerator(key: string): string {
 export function useHotkeys() {
   const hotkeys = useAppStore((s) => s.settings.hotkeys);
   const hotkeysEnabled = useAppStore((s) => s.settings.hotkeysEnabled);
+  const showSettings = useAppStore((s) => s.showSettings);
   const startOrSplit = useAppStore((s) => s.startOrSplit);
   const resetTimer = useAppStore((s) => s.resetTimer);
   const undoSplit = useAppStore((s) => s.undoSplit);
@@ -40,7 +41,7 @@ export function useHotkeys() {
     const registerHotkeys = async () => {
       try {
         await unregisterAll();
-        if (!active || !hotkeysEnabled) return;
+        if (!active || !hotkeysEnabled || showSettings) return;
 
         const bindings: Array<{ key: string; handler: () => void }> = [
           { key: hotkeys.startSplit, handler: startOrSplit },
@@ -74,5 +75,5 @@ export function useHotkeys() {
       active = false;
       unregisterAll().catch(() => {});
     };
-  }, [hotkeys, hotkeysEnabled, startOrSplit, resetTimer, undoSplit, skipSplit, pause]);
+  }, [hotkeys, hotkeysEnabled, showSettings, startOrSplit, resetTimer, undoSplit, skipSplit, pause]);
 }

@@ -446,14 +446,28 @@ function HotkeysTab() {
   const [binding, setBinding] = useState<string | null>(null);
   const [hotkeys, setHotkeys] = useState(settings.hotkeys);
   const [hotkeysEnabled, setHotkeysEnabled] = useState(settings.hotkeysEnabled ?? true);
+  const [unbound, setUnbound] = useState<string | null>(null);
 
   const handleKeyDown = useCallback(
     (action: string, e: React.KeyboardEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      let key = e.code; // e.g. 'Space', 'Numpad1', 'KeyA'
+      const key = e.code; // e.g. 'Space', 'Numpad1', 'KeyA'
       if (key === 'Tab') return;
-      setHotkeys((prev) => ({ ...prev, [action]: key }));
+
+      setHotkeys((prev) => {
+        // Check if this key is already bound to another action
+        const conflict = (Object.keys(prev) as Array<keyof typeof prev>).find(
+          (a) => a !== action && prev[a] === key
+        );
+        if (conflict) {
+          setUnbound(HOTKEY_LABELS[conflict] ?? conflict);
+          setTimeout(() => setUnbound(null), 2500);
+          return { ...prev, [conflict]: '', [action]: key };
+        }
+        setUnbound(null);
+        return { ...prev, [action]: key };
+      });
       setBinding(null);
     },
     []
@@ -529,6 +543,11 @@ function HotkeysTab() {
       >
         Save Hotkeys
       </button>
+      {unbound && (
+        <p className="text-xs" style={{ color: 'var(--text-behind)' }}>
+          Unbound from: {unbound}
+        </p>
+      )}
       <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
         Click a button then press the desired key. Hotkeys work globally even when
         the window is not focused.

@@ -8,6 +8,7 @@ export function SplitList() {
   const splitTimes        = useAppStore((s) => s.splitTimes);
   const currentTime       = useAppStore((s) => s.currentTime);
   const timerState        = useAppStore((s) => s.timerState);
+  const lastRunSegments   = useAppStore((s) => s.lastRunSegments);
   const textSize          = settings.textSize;
   const timerDecimals     = settings.timerDecimals ?? 2;
 
@@ -53,17 +54,24 @@ export function SplitList() {
 
         const pbElapsed = split.pbTime;
         let delta: number | null = null;
-        if (isCompleted && elapsed !== null && pbElapsed !== null) {
+        if (timerState === 'finished' && lastRunSegments) {
+          // Use pre-computed deltas (calculated before PB was overwritten)
+          delta = lastRunSegments[index]?.delta ?? null;
+        } else if (isCompleted && elapsed !== null && pbElapsed !== null) {
           delta = elapsed - pbElapsed;
         } else if (isActive && pbElapsed !== null) {
           delta = currentTime - pbElapsed;
         }
 
+        const finishedSegTime = timerState === 'finished' && lastRunSegments
+          ? lastRunSegments[index]?.segmentTime ?? null
+          : segmentTime;
+
         const isBestSegment =
           isCompleted &&
-          segmentTime !== null &&
+          finishedSegTime !== null &&
           split.bestTime !== null &&
-          segmentTime <= split.bestTime;
+          finishedSegTime <= split.bestTime;
 
         let deltaColor     = 'var(--text-secondary)';
         let deltaGlowClass = '';

@@ -9,6 +9,7 @@ import { SplitList } from './components/SplitList';
 import { Graph } from './components/Graph';
 import { Settings } from './components/Settings';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { invoke } from '@tauri-apps/api/core';
 
 function App() {
   const loadSettings = useAppStore((s) => s.loadSettings);
@@ -28,6 +29,13 @@ function App() {
       applyTheme(settings.theme);
     }
   }, [settings.theme, settingsLoaded]);
+
+  // Sync always-on-top with backend whenever the setting changes
+  useEffect(() => {
+    if (settingsLoaded) {
+      invoke('set_always_on_top', { alwaysOnTop: settings.alwaysOnTop }).catch(() => {});
+    }
+  }, [settings.alwaysOnTop, settingsLoaded]);
 
   // Start the animation-frame ticker
   useTimer();
