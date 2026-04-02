@@ -13,6 +13,11 @@
     "store:allow-load",
     "store:allow-set",
     "store:allow-get",
-    "store:allow-save"
+    "store:allow-save",
+    "dialog:allow-save",
+    "fs:allow-write-text-file",
+    "fs:allow-read-text-file",
+    "fs:scope-download-recursive",
+    "fs:scope-home-recursive"
   ]
 }

@@ -3,6 +3,8 @@ import { useAppStore } from '../store/settingsStore';
 import { Split, Run, RunSegment } from '../types';
 import { themes } from '../themes/themes';
 import { invoke } from '@tauri-apps/api/core';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 
 type Tab = 'splits' | 'hotkeys' | 'appearance' | 'sound';
 
@@ -143,18 +145,21 @@ function SplitsTab() {
     setSplits(next);
   };
 
-  const exportJSON = () => {
-    const json = JSON.stringify(splits, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'splits.json';
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportJSON = async () => {
+    const filePath = await save({
+      defaultPath: 'splits.json',
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (!filePath) return;
+    await writeTextFile(filePath, JSON.stringify(splits, null, 2));
   };
 
-  const exportLSS = () => {
+  const exportLSS = async () => {
+    const filePath = await save({
+      defaultPath: 'splits.lss',
+      filters: [{ name: 'LiveSplit', extensions: ['lss'] }],
+    });
+    if (!filePath) return;
     const segmentXml = splits.map((s) => {
       const pbLine = s.pbTime !== null
         ? `\n        <SplitTime name="Personal Best"><RealTime>${msToLssTime(s.pbTime)}</RealTime></SplitTime>`
@@ -178,13 +183,7 @@ function SplitsTab() {
       '  </Segments>',
       '</Run>',
     ].join('\n');
-    const blob = new Blob([xml], { type: 'application/xml' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = 'splits.lss';
-    a.click();
-    URL.revokeObjectURL(url);
+    await writeTextFile(filePath, xml);
   };
 
   const importFile = (e: React.ChangeEvent<HTMLInputElement>) => {
