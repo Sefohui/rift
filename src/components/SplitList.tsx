@@ -39,17 +39,16 @@ export function SplitList() {
     <div ref={scrollRef} className="flex-1 overflow-y-auto" style={{ overflowX: 'hidden' }}>
       {splits.map((split, index) => {
         const isCompleted = index < splitTimes.length;
+        const isSkipped   = isCompleted && splitTimes[index] === null;
         const isActive    =
           index === currentSplitIndex &&
           (timerState === 'running' || timerState === 'paused');
 
         const elapsed = isCompleted ? splitTimes[index] : null;
-        const segmentTime =
-          elapsed !== null
-            ? index === 0
-              ? elapsed
-              : elapsed - (splitTimes[index - 1] ?? 0)
-            : null;
+        const prevElapsed = isCompleted
+          ? (splitTimes.slice(0, index).findLast((t) => t !== null) ?? 0)
+          : 0;
+        const segmentTime = elapsed !== null ? elapsed - prevElapsed : null;
 
         const pbElapsed = split.pbTime;
         let delta: number | null = null;
@@ -77,7 +76,9 @@ export function SplitList() {
           }
         }
 
-        const textColor = isActive || isCompleted
+        const textColor = isSkipped
+          ? 'var(--text-skipped)'
+          : isActive || isCompleted
           ? 'var(--text-primary)'
           : 'var(--text-secondary)';
 
@@ -96,7 +97,7 @@ export function SplitList() {
               fontSize,
               minHeight: '2rem',
               transition: 'background 0.2s, box-shadow 0.2s',
-              opacity: isCompleted || isActive ? 1 : 0.55,
+              opacity: isSkipped ? 0.4 : isCompleted || isActive ? 1 : 0.55,
             }}
           >
             {/* Split name */}
@@ -123,7 +124,9 @@ export function SplitList() {
                 opacity: isCompleted ? 1 : 0.5,
               }}
             >
-              {elapsed !== null
+              {isSkipped
+                ? 'skip'
+                : elapsed !== null
                 ? formatTime(elapsed, false)
                 : pbElapsed !== null
                 ? formatTime(pbElapsed, false)

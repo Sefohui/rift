@@ -435,9 +435,10 @@ function SplitsTab() {
 // ---- Hotkeys Tab ----
 const HOTKEY_LABELS: Record<string, string> = {
   startSplit: 'Start / Split',
-  reset: 'Reset',
-  undoSplit: 'Undo Split',
-  pause: 'Pause / Resume',
+  reset:      'Reset',
+  undoSplit:  'Undo Split',
+  skipSplit:  'Skip Split',
+  pause:      'Pause / Resume',
 };
 
 function HotkeysTab() {

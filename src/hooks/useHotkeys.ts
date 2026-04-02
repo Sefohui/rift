@@ -31,6 +31,7 @@ export function useHotkeys() {
   const startOrSplit = useAppStore((s) => s.startOrSplit);
   const resetTimer = useAppStore((s) => s.resetTimer);
   const undoSplit = useAppStore((s) => s.undoSplit);
+  const skipSplit = useAppStore((s) => s.skipSplit);
   const pause = useAppStore((s) => s.pause);
 
   useEffect(() => {
@@ -43,9 +44,10 @@ export function useHotkeys() {
 
         const bindings: Array<{ key: string; handler: () => void }> = [
           { key: hotkeys.startSplit, handler: startOrSplit },
-          { key: hotkeys.reset, handler: resetTimer },
-          { key: hotkeys.undoSplit, handler: undoSplit },
-          { key: hotkeys.pause, handler: pause },
+          { key: hotkeys.reset,      handler: resetTimer },
+          { key: hotkeys.undoSplit,  handler: undoSplit },
+          { key: hotkeys.skipSplit,  handler: skipSplit },
+          { key: hotkeys.pause,      handler: pause },
         ];
 
         for (const { key, handler } of bindings) {
@@ -72,5 +74,5 @@ export function useHotkeys() {
       active = false;
       unregisterAll().catch(() => {});
     };
-  }, [hotkeys, hotkeysEnabled, startOrSplit, resetTimer, undoSplit, pause]);
+  }, [hotkeys, hotkeysEnabled, startOrSplit, resetTimer, undoSplit, skipSplit, pause]);
 }

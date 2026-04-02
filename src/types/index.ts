@@ -8,9 +8,9 @@ export interface Split {
 export interface RunSegment {
   splitId: string;
   splitName: string;
-  elapsedTime: number;  // total elapsed time at this split (ms)
-  segmentTime: number;  // time for this segment (ms)
-  delta: number | null; // vs PB elapsed time (negative = faster)
+  elapsedTime: number | null; // null = skipped
+  segmentTime: number | null; // null = skipped
+  delta: number | null;
 }
 
 export interface Run {
@@ -27,6 +27,7 @@ export interface HotkeyMap {
   startSplit: string;
   reset: string;
   undoSplit: string;
+  skipSplit: string;
   pause: string;
 }
 
@@ -56,6 +57,6 @@ export interface TimerSlice {
   currentSplitIndex: number;
   startTime: number | null;       // Date.now() when timer started / resumed
   accumulatedTime: number;        // ms accumulated before current run segment (for pausing)
-  splitTimes: number[];           // elapsed ms at each completed split
+  splitTimes: (number | null)[];  // elapsed ms at each completed split, null = skipped
   currentTime: number;            // current elapsed ms (updated by ticker)
 }

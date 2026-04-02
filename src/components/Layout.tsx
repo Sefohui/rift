@@ -8,6 +8,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const resetTimer   = useAppStore((s) => s.resetTimer);
   const pause        = useAppStore((s) => s.pause);
   const undoSplit    = useAppStore((s) => s.undoSplit);
+  const skipSplit    = useAppStore((s) => s.skipSplit);
   const setShowSettings = useAppStore((s) => s.setShowSettings);
   const settings     = useAppStore((s) => s.settings);
   const splitTimes   = useAppStore((s) => s.splitTimes);
@@ -115,6 +116,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
             disabled={timerState === 'idle' || currentSplitIndex === 0}
           >
             Undo
+          </button>
+          <button
+            className="btn-ghost text-xs px-2 py-1.5"
+            style={{ flex: 1 }}
+            onClick={skipSplit}
+            disabled={timerState !== 'running' || currentSplitIndex >= settings.splits.length - 1}
+          >
+            Skip
           </button>
           <button
             className="btn-danger text-xs px-2 py-1.5"

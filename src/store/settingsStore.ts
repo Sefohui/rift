@@ -17,6 +17,7 @@ const defaultSettings: Settings = {
     startSplit: 'Space',
     reset: 'Numpad1',
     undoSplit: 'Numpad3',
+    skipSplit: 'Numpad2',
     pause: 'Escape',
   },
   hotkeysEnabled: true,
@@ -57,6 +58,7 @@ interface AppState {
   pause: () => void;
   resetTimer: () => void;
   undoSplit: () => void;
+  skipSplit: () => void;
   tickTimer: (now: number) => void;
   finishRun: () => Run | null;
 
@@ -186,13 +188,23 @@ export const useAppStore = create<AppState>((set, get) => ({
       (timerState === 'running' || timerState === 'paused' || timerState === 'finished') &&
       currentSplitIndex > 0;
     if (canUndo) {
-      const newSplitTimes = splitTimes.slice(0, -1);
       set({
         currentSplitIndex: currentSplitIndex - 1,
-        splitTimes: newSplitTimes,
+        splitTimes: splitTimes.slice(0, -1),
         timerState: timerState === 'finished' ? 'running' : timerState,
       });
     }
+  },
+
+  skipSplit: () => {
+    const { timerState, currentSplitIndex, settings, splitTimes } = get();
+    // Cannot skip when not running, or when on the last split
+    if (timerState !== 'running') return;
+    if (currentSplitIndex >= settings.splits.length - 1) return;
+    set({
+      splitTimes: [...splitTimes, null],
+      currentSplitIndex: currentSplitIndex + 1,
+    });
   },
 
   tickTimer: (now: number) => {
@@ -207,22 +219,26 @@ export const useAppStore = create<AppState>((set, get) => ({
     const splits = settings.splits;
     if (splitTimes.length === 0) return null;
 
+    const hasSkipped = splitTimes.some((t) => t === null);
+
     const segments: RunSegment[] = splitTimes.map((elapsed, i) => {
-      const segmentTime = i === 0 ? elapsed : elapsed - splitTimes[i - 1];
-      const pbElapsed = splits[i]?.pbTime ?? null;
-      const delta = pbElapsed !== null ? elapsed - pbElapsed : null;
+      const prevElapsed = splitTimes.slice(0, i).findLast((t) => t !== null) ?? 0;
+      const segmentTime = elapsed !== null ? elapsed - prevElapsed : null;
+      const pbElapsed   = splits[i]?.pbTime ?? null;
+      const delta       = elapsed !== null && pbElapsed !== null ? elapsed - pbElapsed : null;
       return {
-        splitId: splits[i]?.id ?? String(i),
-        splitName: splits[i]?.name ?? `Split ${i + 1}`,
+        splitId:     splits[i]?.id ?? String(i),
+        splitName:   splits[i]?.name ?? `Split ${i + 1}`,
         elapsedTime: elapsed,
         segmentTime,
         delta,
       };
     });
 
-    const totalTime = splitTimes[splitTimes.length - 1];
-    const pbTotal = settings.pb?.totalTime ?? null;
-    const isPersonalBest = pbTotal === null || totalTime < pbTotal;
+    const totalTime = splitTimes[splitTimes.length - 1] ?? 0;
+    const pbTotal   = settings.pb?.totalTime ?? null;
+    // A run with skipped splits can never be a PB
+    const isPersonalBest = !hasSkipped && (pbTotal === null || totalTime < pbTotal);
 
     const run: Run = {
       id: `run-${Date.now()}`,
