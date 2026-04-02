@@ -45,6 +45,7 @@ export interface Settings {
   hotkeysEnabled: boolean;
   theme: string;
   textSize: 'small' | 'normal' | 'large';
+  timerDecimals: 2 | 3;
   showGraph: boolean;
   alwaysOnTop: boolean;
   sound: SoundSettings;

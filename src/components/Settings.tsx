@@ -543,11 +543,12 @@ function AppearanceTab() {
   const saveSettings = useAppStore((s) => s.saveSettings);
   const [theme, setTheme] = useState(settings.theme);
   const [textSize, setTextSize] = useState(settings.textSize);
+  const [timerDecimals, setTimerDecimals] = useState<2 | 3>(settings.timerDecimals ?? 2);
   const [showGraph, setShowGraph] = useState(settings.showGraph);
   const [alwaysOnTop, setAlwaysOnTop] = useState(settings.alwaysOnTop);
 
   const handleSave = async () => {
-    await saveSettings({ theme, textSize, showGraph, alwaysOnTop });
+    await saveSettings({ theme, textSize, timerDecimals, showGraph, alwaysOnTop });
     try {
       await invoke('set_always_on_top', { alwaysOnTop });
     } catch {}
@@ -598,6 +599,28 @@ function AppearanceTab() {
               }}
             >
               {size}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+          Timer precision
+        </label>
+        <div className="flex gap-2">
+          {([2, 3] as const).map((d) => (
+            <button
+              key={d}
+              onClick={() => setTimerDecimals(d)}
+              className="px-3 py-1 rounded text-sm"
+              style={{
+                background: timerDecimals === d ? 'var(--btn-primary-bg)' : 'var(--bg-tertiary)',
+                color: timerDecimals === d ? 'var(--btn-primary-text)' : 'var(--text-secondary)',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              {d === 2 ? '0.00' : '0.000'}
             </button>
           ))}
         </div>

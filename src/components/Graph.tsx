@@ -15,6 +15,24 @@ function msToSeconds(ms: number): number {
   return Math.round(ms / 100) / 10;
 }
 
+function formatGraphTick(s: number): string {
+  if (s >= 60) {
+    const m = Math.floor(s / 60);
+    const rem = Math.floor(s % 60);
+    return `${m}:${String(rem).padStart(2, '0')}`;
+  }
+  return `${s}s`;
+}
+
+function formatGraphTooltip(s: number): string {
+  if (s >= 60) {
+    const m = Math.floor(s / 60);
+    const rem = (s % 60).toFixed(1);
+    return `${m}:${rem.padStart(4, '0')}`;
+  }
+  return `${s}s`;
+}
+
 export function Graph() {
   const settings = useAppStore((s) => s.settings);
   const splitTimes = useAppStore((s) => s.splitTimes);
@@ -94,7 +112,7 @@ export function Graph() {
             tick={{ fill: 'var(--text-secondary)', fontSize: 9 }}
             tickLine={false}
             axisLine={{ stroke: 'var(--border-color)' }}
-            tickFormatter={(v) => `${v}s`}
+            tickFormatter={formatGraphTick}
           />
           <Tooltip
             contentStyle={{
@@ -105,7 +123,7 @@ export function Graph() {
               color: 'var(--text-primary)',
             }}
             formatter={(value: number, name: string) => [
-              `${value}s`,
+              formatGraphTooltip(value),
               name === 'pb' ? 'PB' : 'Current',
             ]}
           />

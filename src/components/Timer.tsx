@@ -1,37 +1,45 @@
 import React from 'react';
 import { useAppStore } from '../store/settingsStore';
 
-function formatTime(ms: number, showMs = true): string {
+function formatTime(ms: number, showMs = true, decimals: 2 | 3 = 2): string {
   if (ms < 0) ms = 0;
   const hours   = Math.floor(ms / 3600000);
   const minutes = Math.floor((ms % 3600000) / 60000);
   const seconds = Math.floor((ms % 60000) / 1000);
-  const millis  = Math.floor((ms % 1000) / 10);
+  const frac    = decimals === 3
+    ? String(Math.floor(ms % 1000)).padStart(3, '0')
+    : String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
 
-  const mm  = String(minutes).padStart(2, '0');
-  const ss  = String(seconds).padStart(2, '0');
-  const ms2 = String(millis).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
 
   if (hours > 0) {
-    return showMs ? `${hours}:${mm}:${ss}.${ms2}` : `${hours}:${mm}:${ss}`;
+    return showMs ? `${hours}:${mm}:${ss}.${frac}` : `${hours}:${mm}:${ss}`;
   }
-  return showMs ? `${mm}:${ss}.${ms2}` : `${mm}:${ss}`;
+  return showMs ? `${mm}:${ss}.${frac}` : `${mm}:${ss}`;
 }
 
-function formatDelta(ms: number): string {
-  const sign = ms < 0 ? '−' : '+';
-  const abs  = Math.abs(ms);
-  const seconds = (abs / 1000).toFixed(2);
-  return `${sign}${seconds}s`;
+function formatDelta(ms: number, decimals: 2 | 3 = 2): string {
+  const sign    = ms < 0 ? '−' : '+';
+  const abs     = Math.abs(ms);
+  const padLen  = decimals === 3 ? 6 : 5; // M:SS.sss vs M:SS.ss
+  if (abs >= 60000) {
+    const m = Math.floor(abs / 60000);
+    const s = ((abs % 60000) / 1000).toFixed(decimals);
+    return `${sign}${m}:${s.padStart(padLen, '0')}`;
+  }
+  return `${sign}${(abs / 1000).toFixed(decimals)}s`;
 }
 
 export function Timer() {
-  const currentTime       = useAppStore((s) => s.currentTime);
-  const timerState        = useAppStore((s) => s.timerState);
-  const currentSplitIndex = useAppStore((s) => s.currentSplitIndex);
-  const splitTimes        = useAppStore((s) => s.splitTimes);
-  const settings          = useAppStore((s) => s.settings);
+  const currentTime           = useAppStore((s) => s.currentTime);
+  const timerState            = useAppStore((s) => s.timerState);
+  const currentSplitIndex     = useAppStore((s) => s.currentSplitIndex);
+  const splitTimes            = useAppStore((s) => s.splitTimes);
+  const settings              = useAppStore((s) => s.settings);
+  const lastRunIsPersonalBest = useAppStore((s) => s.lastRunIsPersonalBest);
   const textSize          = settings.textSize;
+  const timerDecimals     = settings.timerDecimals ?? 2;
 
   const splits = settings.splits;
   const pb     = settings.pb;
@@ -72,10 +80,10 @@ export function Timer() {
     timerGlowClass = 'timer-glow';
     timerAnimClass = 'timer-paused';
   } else if (timerState === 'finished') {
-    if (delta !== null && delta < 0) {
+    if (lastRunIsPersonalBest) {
       timerColor     = 'var(--text-ahead)';
       timerGlowClass = 'timer-glow-ahead';
-    } else if (delta !== null) {
+    } else if (lastRunIsPersonalBest === false) {
       timerColor     = 'var(--text-behind)';
       timerGlowClass = 'timer-glow-behind';
     }
@@ -108,7 +116,7 @@ export function Timer() {
         className={`font-mono font-bold leading-none ${timerGlowClass} ${timerAnimClass}`}
         style={{ fontSize: timerFontSize, color: timerColor }}
       >
-        {formatTime(currentTime)}
+        {formatTime(currentTime, true, timerDecimals)}
       </div>
 
       {/* Delta vs PB */}
@@ -117,7 +125,7 @@ export function Timer() {
           className={`font-mono text-sm mt-1 ${deltaGlowClass}`}
           style={{ color: deltaColor }}
         >
-          {formatDelta(delta)}
+          {formatDelta(delta, timerDecimals)}
         </div>
       )}
     </div>

@@ -9,6 +9,7 @@ export function SplitList() {
   const currentTime       = useAppStore((s) => s.currentTime);
   const timerState        = useAppStore((s) => s.timerState);
   const textSize          = settings.textSize;
+  const timerDecimals     = settings.timerDecimals ?? 2;
 
   const splits     = settings.splits;
   const scrollRef  = useRef<HTMLDivElement>(null);
@@ -113,7 +114,7 @@ export function SplitList() {
               className={`font-mono w-[5.5rem] text-right ${deltaGlowClass}`}
               style={{ color: deltaColor, fontSize: '0.80em' }}
             >
-              {delta !== null ? formatDelta(delta) : ''}
+              {delta !== null ? formatDelta(delta, timerDecimals) : ''}
             </div>
 
             {/* Time */}

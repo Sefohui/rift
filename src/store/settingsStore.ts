@@ -22,6 +22,7 @@ const defaultSettings: Settings = {
   },
   hotkeysEnabled: true,
   theme: 'void',
+  timerDecimals: 2,
   textSize: 'normal',
   showGraph: true,
   alwaysOnTop: false,
