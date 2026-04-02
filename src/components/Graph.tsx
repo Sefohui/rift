@@ -118,6 +118,7 @@ export function Graph() {
               strokeOpacity={0.6}
               dot={false}
               connectNulls
+              isAnimationActive={false}
             />
           )}
           <Line
@@ -127,6 +128,7 @@ export function Graph() {
             strokeWidth={2}
             dot={{ r: 2, fill: 'var(--graph-current)' }}
             connectNulls
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>
